@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nexia – Maserati BDM Assistant (Mockup)</title>
+  <style>
+    :root{
+      --bg:#efefed; --panel:#ffffff; --ink:#202124; --ink-2:#555; --accent:#0ea5e9; --accent-2:#155e75; --ok:#16a34a; --warn:#d97706; --bad:#dc2626; --brand:#111827; --chip:#f3f4f6; --line:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);}
+    body{display:grid;grid-template-columns:280px 1fr;background:var(--bg);}
+    /* Sidebar */
+    .sidebar{background:#f6f6f4;border-right:1px solid var(--line);display:flex;flex-direction:column;height:100vh}
+    .sb-top{padding:16px 14px;display:flex;align-items:center;gap:10px}
+    .logo{display:flex;align-items:center;gap:8px;font-weight:700}
+    .logo .dot{width:20px;height:20px;border-radius:6px;background:#111}
+    .brand{font-size:14px;letter-spacing:.3px}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;margin:6px 10px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    .tab-btn{padding:8px 10px;text-align:center;background:#fff;cursor:pointer;font-weight:600}
+    .tab-btn:not(.active){background:#fafafa;color:#666}
+    .nav{padding:10px;overflow:auto}
+    .nav h5{margin:18px 8px 6px;font-size:12px;color:#777;text-transform:uppercase;letter-spacing:.08em}
+    .nav .item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;margin:4px 0;cursor:pointer}
+    .nav .item:hover{background:#ececeb}
+    .nav .item.active{background:#e7f3fb;color:#075985}
+    .item .dot{width:8px;height:8px;border-radius:50%;background:#cbd5e1}
+    .foot{margin-top:auto;padding:12px 10px;border-top:1px solid var(--line);font-size:12px;color:#666}
+    .user{display:flex;align-items:center;gap:8px}
+    .user .avatar{width:28px;height:28px;border-radius:50%;background:#111;color:#fff;display:grid;place-items:center;font-size:12px}
+
+    /* Main */
+    .main{height:100vh;overflow:auto}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:2}
+    .breadcrumbs{font-size:12px;color:#6b7280}
+    .actions{display:flex;gap:10px;align-items:center}
+    .btn{border:1px solid var(--line);background:#fff;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600}
+    .btn.primary{background:var(--accent);color:#fff;border-color:transparent}
+    .btn.ghost{border:0;background:transparent;color:#555}
+    .pill{background:var(--chip);padding:6px 10px;border-radius:999px;font-size:12px}
+
+    .content{padding:18px;display:grid;gap:16px}
+    .grid{display:grid;gap:16px}
+    .two{grid-template-columns:1.2fr .8fr}
+    .three{grid-template-columns:repeat(3,1fr)}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+    .panel h3{margin:0 0 10px}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .kpi{border:1px solid var(--line);border-radius:12px;padding:10px}
+    .kpi .label{color:#6b7280;font-size:12px}
+    .kpi .value{font-weight:800;font-size:22px}
+    .bad{color:var(--bad)} .ok{color:var(--ok)} .warn{color:var(--warn)}
+
+    /* Tables */
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;font-size:14px}
+    th{color:#6b7280;font-weight:600}
+    tr:last-child td{border-bottom:0}
+    .chip{display:inline-block;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;padding:2px 8px;border-radius:999px;font-size:12px}
+
+    /* Upload drop */
+    .drop{border:2px dashed #cbd5e1;border-radius:12px;padding:18px;text-align:center;color:#6b7280}
+
+    /* Fake charts */
+    .spark{height:54px;background:linear-gradient(90deg,#e5e7eb 8px,transparent 0) left/12px 100% repeat-x;position:relative;border-radius:10px}
+    .spark::after{content:"";position:absolute;left:0;right:0;top:12px;height:2px;background:#cbd5e1}
+    .bar{height:130px;display:grid;grid-template-columns:repeat(10,1fr);gap:6px;align-items:end}
+    .bar span{display:block;background:#d1fae5;border-radius:6px}
+    .bar span:nth-child(3),.bar span:nth-child(7){background:#fee2e2}
+
+    /* Layout states */
+    .view{display:none}
+    .view.active{display:block}
+    .subtabs{display:flex;gap:8px;margin-bottom:8px}
+    
+    .score{display:flex;gap:8px;align-items:center}
+    .score b{font-size:20px}
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-top">
+      <div class="logo"><div class="dot"></div><div class="brand">nexia</div></div>
+      <div style="margin-left:auto;font-size:12px;color:#6b7280">Maserati Edition</div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab-btn active" data-mode="chat">Chat</div>
+      <div class="tab-btn" data-mode="meeting">Meeting</div>
+    </div>
+
+    <div class="nav" id="nav">
+      <h5>Workflows</h5>
+      <div class="item active" data-view="home"><span class="dot"></span> Home</div>
+      <div class="item" data-view="prebrief"><span class="dot"></span> Pre‑Visit Brief</div>
+      <div class="item" data-view="transcript"><span class="dot"></span> Live Transcript + KPI</div>
+      <div class="item" data-view="compliance"><span class="dot"></span> Photo/Video Compliance</div>
+      <div class="item" data-view="actions"><span class="dot"></span> Action Tracker</div>
+      <div class="item" data-view="dashboard"><span class="dot"></span> Performance Dashboard</div>
+      <div class="item" data-view="ev"><span class="dot"></span> EV Updates & Training</div>
+      <div class="item" data-view="search"><span class="dot"></span> Smart Knowledge Search</div>
+
+      <h5>Recent</h5>
+      <div class="item" data-view="recent"><span class="dot"></span> Quarterly Dealership Meet…</div>
+    </div>
+
+    <div class="foot">
+      <div class="user"><div class="avatar">U</div><div>
+        <div style="font-weight:700;font-size:13px">Uzy (Guest)</div>
+        <div style="font-size:12px;color:#6b7280">GPT‑4.1 · Pinecone‑RAG</div>
+      </div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="breadcrumbs">Maserati / BDM Assistant</div>
+        <div style="font-size:18px;font-weight:800">Hello there! How can I help you today?</div>
+      </div>
+      <div class="actions">
+        <span class="pill">Region: AU/NZ</span>
+        <button class="btn">Export PDF</button>
+        <button class="btn primary">Start Meeting</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- HOME -->
+      <section class="view active" id="home">
+        <div class="grid two">
+          <div class="panel">
+            <h3>Ask Nexia</h3>
+            <div class="drop" style="margin-bottom:10px">Type a question or drop a file…</div>
+            <div class="subtabs">
+              <span class="pill">Grounded by CRM & notes</span>
+              <span class="pill">Cites retail standards</span>
+              <span class="pill">Stores follow‑ups</span>
+            </div>
+            <div class="kpis">
+              <div class="kpi"><div class="label">Open Actions</div><div class="value warn">18</div></div>
+              <div class="kpi"><div class="label">Avg Compliance</div><div class="value ok">88%</div></div>
+              <div class="kpi"><div class="label">EV Readiness</div><div class="value">79%</div></div>
+              <div class="kpi"><div class="label">Risk Flags</div><div class="value bad">3</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Weekly Digest (AI)</h3>
+            <ul>
+              <li><b>EV bay signage</b> below spec in 67% of dealers. Recommend webinar + sign packs.</li>
+              <li><b>Test‑drive conversion</b> down 4 pts in Perth. Focus: staff training & follow‑up scripts.</li>
+              <li><b>Uniform non‑compliance</b> recurring at Sydney – escalate to Dealer Principal.</li>
+            </ul>
+            <div class="spark" title="Trend sparkline"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRE-VISIT BRIEF -->
+      <section class="view" id="prebrief">
+        <div class="panel">
+          <h3>Pre‑Visit Brief</h3>
+          <div class="grid three">
+            <div class="panel"><div class="label">Dealer</div>
+              <select style="width:100%;padding:8px;border-radius:10px;border:1px solid var(--line)">
+                <option>Maserati Perth</option>
+                <option>Maserati Sydney</option>
+                <option>Maserati Brisbane</option>
+              </select>
+              <p style="color:#6b7280;margin-top:8px">Compiled from CRM, last 3 reports, and Pinecone knowledge.</p>
+            </div>
+            <div class="panel"><div class="label">Alerts</div>
+              <ul>
+                <li>Sales −8% vs region average (last 30 days)</li>
+                <li>EV product training overdue</li>
+                <li>2 actions overdue from previous visit</li>
+              </ul>
+            </div>
+            <div class="panel"><div class="label">Meeting Goals</div>
+              <ul>
+                <li>Improve EV test‑drive conversion to 18%</li>
+                <li>Close uniform policy action</li>
+                <li>Schedule service bay signage fix</li>
+              </ul>
+            </div>
+          </div>
+          <h4>Key KPIs</h4>
+          <table>
+            <thead><tr><th>KPI</th><th>Current</th><th>Target</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Test‑drive → Sale</td><td>10%</td><td>15%</td><td><span class="chip">Focus</span></td></tr>
+              <tr><td>Aftersales NPS</td><td>72</td><td>80</td><td>—</td></tr>
+              <tr><td>Retail Standards</td><td>82%</td><td>90%</td><td><span class="chip">Needs Fix</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- LIVE TRANSCRIPT + KPI -->
+      <section class="view" id="transcript">
+        <div class="grid two">
+          <div class="panel">
+            <h3>Meeting Agenda</h3>
+            <div class="drop" style="text-align:left">Enter your agenda here…</div>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn primary">Start Recording</button>
+              <button class="btn">Summarise</button>
+              <button class="btn">Analyse</button>
+              <button class="btn">Score vs KPIs</button>
+            </div>
+            <p style="color:#6b7280;margin-top:8px">AI will write structured notes and compare against policies & targets.</p>
+          </div>
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3>Live Transcript</h3>
+              <div class="score">Overall Compliance: <b class="ok">85%</b></div>
+            </div>
+            <div class="drop" style="height:220px">Transcript stream…</div>
+            <h4>Detected Items</h4>
+            <ul>
+              <li>Action: Order EV signage pack <span class="chip">Created</span></li>
+              <li>Risk: Low test‑drive conversion – assign training</li>
+              <li>Follow‑up: Uniform briefing evidence required</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMPLIANCE VISION -->
+      <section class="view" id="compliance">
+        <div class="panel">
+          <h3>Photo/Video Compliance Audit</h3>
+          <div class="drop">Drag photos or 30‑sec video here</div>
+          <div class="grid two" style="margin-top:12px">
+            <div class="panel">
+              <h4>Instant Results</h4>
+              <table>
+                <thead><tr><th>Area</th><th>Result</th><th>Comment</th></tr></thead>
+                <tbody>
+                  <tr><td>Vehicle spacing</td><td class="ok">✅</td><td>Meets 1.2 m spec</td></tr>
+                  <tr><td>Brand backdrop</td><td class="bad">❌</td><td>0.5 m too low – raise to eye height</td></tr>
+                  <tr><td>EV safety signage</td><td class="warn">⚠️</td><td>Present but obscured – reposition</td></tr>
+                  <tr><td>Uniform policy</td><td class="bad">❌</td><td>Non‑brand cap detected</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="panel">
+              <h4>Network Heat‑Map</h4>
+              <div class="bar">
+                <span style="height:35%"></span>
+                <span style="height:68%"></span>
+                <span style="height:30%"></span>
+                <span style="height:85%"></span>
+                <span style="height:77%"></span>
+                <span style="height:60%"></span>
+                <span style="height:28%"></span>
+                <span style="height:90%"></span>
+                <span style="height:72%"></span>
+                <span style="height:66%"></span>
+              </div>
+              <p style="color:#6b7280">Repeat offenders auto‑flagged. Evidence linked.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACTION TRACKER -->
+      <section class="view" id="actions">
+        <div class="panel">
+          <h3>Action Tracker</h3>
+          <table>
+            <thead><tr><th>Action</th><th>Owner</th><th>Due</th><th>Status</th><th>Evidence</th></tr></thead>
+            <tbody>
+              <tr><td>Re‑mount brand backdrop to 1.8 m</td><td>Dealer Ops</td><td>22 Apr</td><td><span class="chip">Open</span></td><td><button class="btn">Upload</button></td></tr>
+              <tr><td>Relocate EV safety signage</td><td>Service Lead</td><td>22 Apr</td><td><span class="chip">Open</span></td><td><button class="btn">Upload</button></td></tr>
+              <tr><td>Uniform briefing & photo</td><td>Front Desk</td><td>Today</td><td><span class="chip">Overdue</span></td><td><button class="btn">Upload</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- DASHBOARD -->
+      <section class="view" id="dashboard">
+        <div class="grid three">
+          <div class="panel"><h3>Overall Compliance</h3><div class="spark"></div><p><b>88%</b> avg · ▲ +3 pts WoW</p></div>
+          <div class="panel"><h3>Test‑drive Conversion</h3><div class="spark"></div><p><b>12%</b> region · Target 15%</p></div>
+          <div class="panel"><h3>Action Closure</h3><div class="spark"></div><p><b>74%</b> last 30 days</p></div>
+        </div>
+        <div class="panel" style="margin-top:12px">
+          <h3>Dealer Trend Table</h3>
+          <table>
+            <thead><tr><th>Dealer</th><th>Score</th><th>Key Fail</th><th>Trend</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Perth</td><td>82%</td><td>Backdrop height</td><td>▲ +4 pts</td><td>Fix due 22 Apr</td></tr>
+              <tr><td>Sydney</td><td>91%</td><td>Uniforms</td><td>▼ −2 pts</td><td>Closed</td></tr>
+              <tr><td>Brisbane</td><td>77%</td><td>EV signage</td><td>▲ +1 pt</td><td>Escalated</td></tr>
+              <tr><td>Melbourne</td><td>94%</td><td>—</td><td>—</td><td>N/A</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- EV UPDATES -->
+      <section class="view" id="ev">
+        <div class="panel">
+          <h3>EV Updates & Training</h3>
+          <ul>
+            <li><b>New incentive</b>: Q3 EV finance offer – push to sales teams.</li>
+            <li><b>Training</b>: GranTurismo Folgore product deep‑dive (30 min).</li>
+            <li><b>FAQ</b>: Charging anxiety rebuttal script updated.</li>
+          </ul>
+          <button class="btn primary">Assign training to Perth</button>
+        </div>
+      </section>
+
+      <!-- SMART SEARCH -->
+      <section class="view" id="search">
+        <div class="panel">
+          <h3>Smart Knowledge Search</h3>
+          <input placeholder="Ask across Retail Standards, Policies, and Best Practices…" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--line)" />
+          <div style="margin-top:10px">
+            <div><b>Result 1</b> – Retail Standards: EV bay layout (v2.1) <span class="pill">Maserati</span></div>
+            <div><b>Result 2</b> – Best Practice: Test‑drive follow‑up cadence</div>
+            <div><b>Result 3</b> – Policy: Uniform & grooming guidelines</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECENT -->
+      <section class="view" id="recent">
+        <div class="panel"><h3>Quarterly Dealership Meeting</h3>
+          <p>Transcript summary, actions, and KPI score stored here.</p>
+          <button class="btn">Open record</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Switch left menu views
+    document.querySelectorAll('.nav .item').forEach(el=>{
+      el.addEventListener('click',()=>{
+        document.querySelectorAll('.nav .item').forEach(i=>i.classList.remove('active'));
+        el.classList.add('active');
+        const id = el.getAttribute('data-view');
+        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+      })
+    })
+  </script>
+</body>
+</html>
