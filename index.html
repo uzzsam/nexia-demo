@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nexia – BDM Assistant (Actionable Mockup)</title>
+<style>
+  :root {
+    --bg:#f6f7f9; --card:#ffffff; --ink:#0f172a; --muted:#6b7280; --line:#e5e7eb; --brand:#0ea5e9; --brand-ink:#075985;
+    --good:#16a34a; --warn:#f59e0b; --bad:#dc2626; --pill:#eef6ff;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin:0; background:var(--bg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; color:var(--ink); }
+  /* Layout */
+  .app { display:flex; min-height:100vh; }
+  .sidebar { width: 280px; background: #fff; border-right:1px solid var(--line); padding:16px; position:sticky; top:0; height:100vh; overflow:auto; }
+  .sidebar h2 { margin:0 0 12px; font-size:18px; }
+  .nav { list-style:none; padding:0; margin:8px 0 0; }
+  .nav li { padding:10px 12px; margin:4px 0; border-radius:8px; cursor:pointer; color:#111827; display:flex; justify-content:space-between; align-items:center; }
+  .nav li.active, .nav li:hover { background:#f3f4f6; }
+  .badge { font-size:12px; padding:2px 6px; border-radius:999px; background:#eef2ff; color:#3730a3; }
+
+  .main { flex:1; padding:20px; }
+  .grid { display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .panel h3 { margin:0 0 12px; font-size:16px; }
+  .row { display:flex; gap:12px; align-items:center; }
+  .kpis { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; }
+  .kpi { background:#fafafa; border:1px solid var(--line); padding:10px 12px; border-radius:10px; min-width:120px; text-align:center; }
+  .kpi b { display:block; font-size:18px; }
+
+  /* Ask → Insight → Action */
+  .ask { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+  .ask .col { background:#fafafa; border:1px solid var(--line); border-radius:10px; padding:12px; min-height:160px; }
+  .ask input[type="text"] { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; background:var(--pill); color:var(--brand-ink); font-size:12px; margin-right:6px; }
+
+  /* Risk Cards */
+  .risk-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+  .risk-card { border:1px solid var(--line); border-radius:12px; padding:12px; background:#fff; display:flex; flex-direction:column; gap:8px; }
+  .risk-header { display:flex; align-items:center; justify-content:space-between; }
+  .kpi-chip { font-size:12px; padding:2px 8px; border-radius:999px; background:#eef2ff; color:#1e3a8a; }
+  .risk-score { font-weight:600; }
+  .risk-score.bad { color:var(--bad); }
+  .risk-score.warn { color:var(--warn); }
+  .risk-score.good { color:var(--good); }
+  .drivers { color:var(--muted); font-size:13px; }
+  .sparkline { background:linear-gradient(180deg,#eef2ff,#fff); border:1px dashed #c7d2fe; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:12px; }
+  .risk-actions { display:flex; gap:8px; }
+  .btn { padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; }
+  .btn.primary { background:var(--brand); color:#fff; border-color:transparent; }
+  .btn.ghost { background:#fff; }
+
+  /* Leaderboard */
+  table { width:100%; border-collapse:collapse; }
+  th, td { border:1px solid var(--line); padding:8px; text-align:left; }
+  th { background:#f8fafc; font-weight:600; }
+  .trend-up { color:var(--good); }
+  .trend-down { color:var(--bad); }
+  .percentile { font-size:12px; color:var(--muted); }
+
+  /* EV Tabs */
+  .tabs { display:flex; gap:8px; margin-bottom:8px; }
+  .tab { padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; }
+  .tab.active { background:#eff6ff; border-color:#93c5fd; }
+  .progress { height:8px; background:#eef2ff; border-radius:999px; overflow:hidden; }
+  .progress > span { display:block; height:8px; background:#60a5fa; }
+  .risk-tag { font-size:12px; padding:2px 6px; border-radius:6px; background:#fff7ed; color:#9a3412; }
+
+  /* QBR Builder */
+  .qbr-controls { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+  .preview { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+  .slide { border:1px dashed var(--line); border-radius:10px; padding:10px; background:#fcfcfd; min-height:90px; }
+
+  /* Audits & CAPA */
+  .capa-item { display:grid; grid-template-columns: 1.6fr 0.8fr 0.7fr 0.6fr 0.5fr; gap:8px; align-items:center; border:1px solid var(--line); border-radius:10px; padding:8px; margin-bottom:8px; background:#fff; }
+  .status-pill { padding:4px 8px; border-radius:999px; font-size:12px; }
+  .status-open { background:#fef3c7; color:#92400e; }
+  .status-progress { background:#dbeafe; color:#1e3a8a; }
+  .status-overdue { background:#fee2e2; color:#991b1b; }
+  .board { display:grid; grid-template-columns: repeat(5, 1fr); gap:8px; }
+  .col { background:#fafafa; border:1px solid var(--line); border-radius:10px; padding:8px; min-height:120px; }
+  .col h4 { margin:0 0 6px; font-size:13px; color:var(--muted); }
+
+  /* Integration Hub */
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+  .muted { color:var(--muted); }
+
+  /* Field Visit */
+  .pin { border:1px dashed var(--line); padding:6px; border-radius:8px; margin-top:6px; background:#f8fafc; font-size:13px; }
+  .pinned-tray { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+
+  /* Right Actions Drawer */
+  .drawer { position: fixed; top:0; right:-420px; width:420px; height:100vh; background:#fff; border-left:1px solid var(--line); box-shadow:-2px 0 12px rgba(0,0,0,.06); transition:right .25s ease; padding:16px; overflow:auto; z-index:40; }
+  .drawer.open { right:0; }
+  .drawer h3 { margin-top:0; }
+  .playbook-card { border:1px solid var(--line); border-radius:10px; padding:12px; background:#fcfcff; }
+  .playbook-card h4 { margin:0 0 6px; }
+  .field { display:grid; gap:4px; margin:8px 0; }
+  .field input, .field select, .field textarea { padding:8px; border:1px solid var(--line); border-radius:8px; }
+
+  /* Playbook Studio modal */
+  .modal { position:fixed; inset:0; background:rgba(15,23,42,.45); display:none; align-items:center; justify-content:center; z-index:50; }
+  .modal.open { display:flex; }
+  .modal .sheet { width:720px; max-width:92vw; background:#fff; border-radius:12px; border:1px solid var(--line); padding:16px; }
+  .modal .grid-two { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+
+  /* Footer */
+  .foot { margin-top:8px; font-size:12px; color:var(--muted); display:flex; gap:12px; }
+
+  @media (max-width: 1200px) {
+    .grid { grid-template-columns: 1fr; }
+    .risk-grid { grid-template-columns: 1fr 1fr; }
+    .ask { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 720px) {
+    .sidebar { display:none; }
+    .risk-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <h2>Nexia</h2>
+    <div class="muted" style="font-size:12px;">Maserati – Regional / BDM Assistant</div>
+    <ul class="nav" id="nav">
+      <li class="active" data-view="home">Home <span class="badge">New</span></li>
+      <li data-view="previsit">Pre-Visit Brief</li>
+      <li data-view="live">Live Transcript + KPI Pins</li>
+      <li data-view="audits">Audits & CAPA</li>
+      <li data-view="actions">Action Tracker</li>
+      <li data-view="dash">Performance Dashboard</li>
+      <li data-view="ev">EV Transition Command Centre</li>
+      <li data-view="coach">Dealer Leaderboards</li>
+      <li data-view="qbr">QBR/MBR Report Builder</li>
+      <li data-view="playbooks">Playbook Studio</li>
+      <li data-view="integrations">Integration Hub</li>
+      <li data-view="search">Smart Knowledge Search</li>
+    </ul>
+    <div class="foot"><span>Read-only mode</span><span>Model v0.1</span><span>Last sync 09:15</span></div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- HOME VIEW -->
+    <section id="view-home">
+      <div class="panel">
+        <h3>Ask → Insight → Action</h3>
+        <div class="ask">
+          <div class="col">
+            <b>Ask Nexia</b>
+            <p class="muted">Natural-language queries across CRM/DMS/CX</p>
+            <input type="text" placeholder="e.g. Which dealers in WA risk missing August EV targets?" />
+            <div class="kpis">
+              <div class="kpi"><span>Open Actions</span><b>18</b></div>
+              <div class="kpi"><span>Avg Compliance</span><b>88%</b></div>
+              <div class="kpi"><span>EV Readiness</span><b>79%</b></div>
+              <div class="kpi"><span>Risk Flags</span><b>3</b></div>
+            </div>
+          </div>
+          <div class="col">
+            <b>Explanation</b>
+            <p class="muted">Why this dealer/region is at risk</p>
+            <div class="pin">CSI down 8 points vs target. Drivers: NPS detractors ↑ (service wait >45m), parts backorders, weekend coverage gaps.</div>
+            <div class="pin">Impact: −8 units vs Aug target (confidence 0.78). Data: Medallia, CDK ROs, roster export.</div>
+          </div>
+          <div class="col">
+            <b>Actions</b>
+            <p class="muted">Next best steps</p>
+            <div class="pin">
+              <span class="pill">Playbook</span> Service CSI Recovery L1
+              <div class="muted" style="margin-top:6px;">• Schedule advisor refresher • Priority call-backs (N=23) • Parts ETA comms</div>
+              <div class="row" style="margin-top:8px;">
+                <button class="btn primary" onclick="openDrawer('Service CSI Recovery (Level 1)')">Apply</button>
+                <button class="btn ghost">Preview</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Predictive KPI Risks</h3>
+        <div class="risk-grid">
+          <div class="risk-card">
+            <div class="risk-header">
+              <span class="kpi-chip">CSI</span>
+              <span class="risk-score bad">High • 0.78</span>
+            </div>
+            <div class="drivers">Drivers: Detractors↑, Wait times↑, Parts ETA slippage</div>
+            <div class="sparkline">CSI trend</div>
+            <div class="drivers">Impact: −8 pts vs Aug target (−8 units est.)</div>
+            <div class="risk-actions">
+              <button class="btn" onclick="explain('CSI risk – WA Perth')">Explain</button>
+              <button class="btn primary" onclick="openDrawer('Service CSI Recovery (Level 1)')">Apply Playbook</button>
+              <button class="btn ghost">Snooze</button>
+            </div>
+          </div>
+          <div class="risk-card">
+            <div class="risk-header">
+              <span class="kpi-chip">EV Readiness</span>
+              <span class="risk-score warn">Medium • 0.62</span>
+            </div>
+            <div class="drivers">Charger installs 75% • Staff cert 68% • State rebate comms low</div>
+            <div class="sparkline">Readiness trend</div>
+            <div class="drivers">Impact: −12% conversion risk in Q4</div>
+            <div class="risk-actions">
+              <button class="btn" onclick="explain('EV readiness – Sydney Metro')">Explain</button>
+              <button class="btn primary" onclick="openDrawer('EV Retail Activation (Level 1)')">Apply Playbook</button>
+              <button class="btn ghost">Snooze</button>
+            </div>
+          </div>
+          <div class="risk-card">
+            <div class="risk-header">
+              <span class="kpi-chip">Sales vs Target</span>
+              <span class="risk-score warn">Medium • 0.58</span>
+            </div>
+            <div class="drivers">Test drive-to-order 14% • Finance approvals slow • Inventory mix skew</div>
+            <div class="sparkline">Sales mix</div>
+            <div class="drivers">Impact: −5 units by month-end</div>
+            <div class="risk-actions">
+              <button class="btn" onclick="explain('Sales shortfall – Brisbane')">Explain</button>
+              <button class="btn primary" onclick="openDrawer('Retail Conversion Boost (Level 1)')">Apply Playbook</button>
+              <button class="btn ghost">Escalate</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRE-VISIT BRIEF -->
+    <section id="view-previsit" style="display:none;">
+      <div class="panel">
+        <h3>Pre-Visit Brief</h3>
+        <div class="row" style="gap:8px;">
+          <input class="mono" style="flex:1; padding:8px; border:1px solid var(--line); border-radius:8px;" placeholder="Select dealer (e.g., Perth Maserati)" />
+          <button class="btn">Load Brief</button>
+          <button class="btn ghost" onclick="pinToQBR('Pre-Visit Brief added to report')">Pin to QBR</button>
+        </div>
+        <div class="kpis" style="margin-top:12px;">
+          <div class="kpi"><span>Sales vs Target</span><b>−5</b></div>
+          <div class="kpi"><span>CSI</span><b>80</b></div>
+          <div class="kpi"><span>Open CAPA</span><b>7</b></div>
+          <div class="kpi"><span>EV Score</span><b>72%</b></div>
+        </div>
+        <div class="pin">Last visit (6 Jul): signage non-compliant; service wait times flagged; 2 actions overdue.</div>
+      </div>
+    </section>
+
+    <!-- LIVE TRANSCRIPT + KPI PINS -->
+    <section id="view-live" style="display:none;">
+      <div class="panel">
+        <h3>Live Transcript + KPI Pins</h3>
+        <textarea style="width:100%; min-height:160px; padding:10px; border:1px solid var(--line); border-radius:8px;" placeholder="Live notes / transcript…"></textarea>
+        <div class="row" style="margin-top:8px;">
+          <button class="btn" onclick="pinToQBR('Pinned: Dealer agreed to staff EV certification by 30 Aug')">Pin to QBR</button>
+          <button class="btn ghost" onclick="pinToQBR('Pinned: Backorder ETA process update')">Pin KPI</button>
+        </div>
+        <div class="pinned-tray" id="pinnedTray"></div>
+      </div>
+    </section>
+
+    <!-- AUDITS & CAPA -->
+    <section id="view-audits" style="display:none;">
+      <div class="panel">
+        <h3>Audits & CAPA</h3>
+        <div class="muted">Offline-friendly capture, photo evidence, owner & due date. GPS/time captured on mobile.</div>
+        <div class="capa-item">
+          <span>Showroom branding – Maserati MY25</span>
+          <button class="btn">Upload Photo</button>
+          <select><option>Assign…</option><option>Dealer Principal</option><option>Marketing Lead</option></select>
+          <input type="date" />
+          <span class="status-pill status-open">Open</span>
+        </div>
+        <div class="capa-item">
+          <span>Service bay EV safety signage</span>
+          <button class="btn">Upload Photo</button>
+          <select><option>Assign…</option><option>Service Manager</option></select>
+          <input type="date" />
+          <span class="status-pill status-progress">In Progress</span>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>CAPA Board</h3>
+        <div class="board">
+          <div class="col"><h4>Open</h4><div class="pin">Branding – MY25</div></div>
+          <div class="col"><h4>In Progress</h4><div class="pin">EV signage</div></div>
+          <div class="col"><h4>Due Soon</h4><div class="pin">Advisor refresher roster</div></div>
+          <div class="col"><h4>Overdue</h4><div class="pin">Parts ETA comms</div></div>
+          <div class="col"><h4>Closed</h4><div class="pin">Showroom lighting audit</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERFORMANCE DASHBOARD (placeholder) -->
+    <section id="view-dash" style="display:none;">
+      <div class="panel"><h3>Performance Dashboard</h3><div class="muted">Region → Dealer → Dept drill-downs (placeholder).</div></div>
+    </section>
+
+    <!-- EV TRANSITION COMMAND CENTRE -->
+    <section id="view-ev" style="display:none;">
+      <div class="panel">
+        <h3>EV Transition Command Centre</h3>
+        <div class="tabs">
+          <button class="tab active" data-tab="infra" onclick="switchTab('infra')">Infrastructure</button>
+          <button class="tab" data-tab="people" onclick="switchTab('people')">People</button>
+          <button class="tab" data-tab="stock" onclick="switchTab('stock')">Stock</button>
+          <button class="tab" data-tab="policy" onclick="switchTab('policy')">Policy & Incentives</button>
+        </div>
+        <div id="tab-infra">
+          <div class="row" style="justify-content:space-between;">
+            <div style="flex:1;">
+              <div>Charger Installations</div>
+              <div class="progress"><span style="width:75%"></span></div>
+            </div>
+            <span class="risk-tag">Lead time risk: Medium</span>
+          </div>
+          <div class="pin" style="margin-top:8px;">
+            Nexia suggests: expedite vendor PO; schedule safety inspection; publish charger usage SOP.
+            <div class="row" style="margin-top:6px;"><button class="btn primary" onclick="openDrawer('EV Infrastructure Catch-up (Level 1)')">Apply Playbook</button></div>
+          </div>
+        </div>
+        <div id="tab-people" style="display:none;">
+          <div>Staff Certification</div>
+          <div class="progress"><span style="width:68%"></span></div>
+          <div class="pin" style="margin-top:8px;">Schedule certification sessions; assign trainer; track attendance.</div>
+        </div>
+        <div id="tab-stock" style="display:none;">
+          <div>EV Stock Availability</div>
+          <div class="progress"><span style="width:80%"></span></div>
+          <div class="pin" style="margin-top:8px;">Rebalance demo fleet; prioritise high-conversion trims.</div>
+        </div>
+        <div id="tab-policy" style="display:none;">
+          <div class="pin">State rebates summary: NSW $x, VIC $y. Tariff snapshot; expected policy review Q4. Ensure dealer comms updated.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEALER COACHING LEADERBOARDS -->
+    <section id="view-coach" style="display:none;">
+      <div class="panel">
+        <h3>Dealer Coaching Leaderboards</h3>
+        <table>
+          <tr><th>Dealer</th><th>Test Drive → Order</th><th>CSI</th><th>Compliance</th><th>Peers</th><th>Drivers</th><th>Action</th></tr>
+          <tr>
+            <td>Melbourne</td><td>19% <span class="trend-up">▲</span></td><td>92</td><td>95%</td>
+            <td class="percentile">Top 10%</td>
+            <td class="muted">Strong advisor follow-up; clean RO process</td>
+            <td><button class="btn" onclick="openDrawer('Replicate Best Practice – Melbourne Coaching Pack')">Assign Task</button></td>
+          </tr>
+          <tr>
+            <td>Perth</td><td>15% <span class="trend-down">▼</span></td><td>85</td><td>88%</td>
+            <td class="percentile">P45</td>
+            <td class="muted">Wait times; detractors; weekend cover</td>
+            <td><button class="btn" onclick="openDrawer('Service CSI Recovery (Level 1)')">Assign Task</button></td>
+          </tr>
+          <tr>
+            <td>Sydney</td><td>14% <span class="trend-down">▼</span></td><td>80</td><td>90%</td>
+            <td class="percentile">P40</td>
+            <td class="muted">Charger delays; staff certification</td>
+            <td><button class="btn" onclick="openDrawer('EV Retail Activation (Level 1)')">Assign Task</button></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- QBR / MBR REPORT BUILDER -->
+    <section id="view-qbr" style="display:none;">
+      <div class="panel">
+        <h3>QBR/MBR Report Builder</h3>
+        <div class="qbr-controls">
+          <select>
+            <option>QBR (Region)</option>
+            <option>MBR (Dealer)</option>
+            <option>Dealer Deep-Dive</option>
+          </select>
+          <label><input type="checkbox" checked> KPI Overview</label>
+          <label><input type="checkbox" checked> Risks & Actions</label>
+          <label><input type="checkbox"> EV Readiness</label>
+          <label><input type="checkbox"> Compliance & CAPA</label>
+          <button class="btn primary">Generate with Commentary</button>
+          <button class="btn">Download PPT</button>
+          <button class="btn">Download PDF</button>
+        </div>
+        <div class="preview">
+          <div class="slide">Title & Objectives</div>
+          <div class="slide">KPI Overview</div>
+          <div class="slide">Risks & Drivers</div>
+          <div class="slide">Playbooks Applied</div>
+          <div class="slide">Dealer Deep-Dives</div>
+          <div class="slide">Appendix (Evidence)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYBOOK STUDIO -->
+    <section id="view-playbooks" style="display:none;">
+      <div class="panel">
+        <h3>Playbook Studio</h3>
+        <div class="row" style="justify-content:space-between;">
+          <div class="muted">Create opinionated actions with triggers, steps, evidence and SLAs.</div>
+          <button class="btn primary" onclick="openPlaybookModal()">New Playbook</button>
+        </div>
+        <table style="margin-top:8px;">
+          <tr><th>Name</th><th>Trigger</th><th>Owner Role</th><th>SLA</th><th>Evidence</th></tr>
+          <tr><td>Service CSI Recovery (L1)</td><td>CSI < 85 or detractors spike</td><td>Service Manager</td><td>7 days</td><td>Photos, call logs</td></tr>
+          <tr><td>EV Retail Activation (L1)</td><td>Readiness < 80%</td><td>Dealer Principal</td><td>14 days</td><td>Charger cert, staff list</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- INTEGRATION HUB -->
+    <section id="view-integrations" style="display:none;">
+      <div class="panel">
+        <h3>Integration Hub</h3>
+        <table>
+          <tr><th>System</th><th>Mode</th><th>Last Sync</th><th>Scope</th><th>PII</th><th>Lineage</th></tr>
+          <tr><td>Salesforce</td><td>API (read-only)</td><td>Today 09:15</td><td>Leads, Opps</td><td>Yes</td><td class="mono">CRM → ETL v1.1 → KPI v1.2</td></tr>
+          <tr><td>CDK</td><td>SFTP</td><td>Yesterday 23:00</td><td>ROs, Parts</td><td>No</td><td class="mono">DMS → Batch ETL → Service KPIs</td></tr>
+          <tr><td>Medallia</td><td>API</td><td>Today 08:40</td><td>NPS, Comments</td><td>Yes</td><td class="mono">VOC → NLP v0.4 → CSI</td></tr>
+        </table>
+        <div class="foot"><span>All write-backs disabled until legal approval.</span></div>
+      </div>
+    </section>
+
+    <!-- SMART SEARCH -->
+    <section id="view-search" style="display:none;">
+      <div class="panel"><h3>Smart Knowledge Search</h3><div class="muted">Search brand standards, policy, incentives. (Placeholder)</div></div>
+    </section>
+
+    <!-- ACTION TRACKER (light scaffold) -->
+    <section id="view-actions" style="display:none;">
+      <div class="panel"><h3>Action Tracker</h3><div class="muted">Consolidated tasks from playbooks and CAPA. (Placeholder)</div></div>
+    </section>
+
+    <!-- ACTIONS DRAWER -->
+    <aside id="actionsDrawer" class="drawer" aria-hidden="true">
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <h3>Suggested Playbook</h3>
+        <button class="btn" onclick="closeDrawer()">Close</button>
+      </div>
+      <div class="playbook-card">
+        <h4 id="pbTitle">Service CSI Recovery (Level 1)</h4>
+        <div class="muted">Drivers: Wait times >45m, detractors spike, parts ETA slippage.</div>
+        <ul>
+          <li>Schedule service advisor refresher</li>
+          <li>Priority call-back list (N=23)</li>
+          <li>Parts ETA comms template rollout</li>
+        </ul>
+        <div class="field">
+          <label>Owner</label>
+          <select><option>Assign…</option><option>Service Manager</option><option>Dealer Principal</option></select>
+        </div>
+        <div class="field">
+          <label>Due</label>
+          <input type="date" />
+        </div>
+        <div class="field">
+          <label>Notes</label>
+          <textarea rows="3" placeholder="Add context"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn primary">Create CAPA</button>
+          <button class="btn">Track Remediation</button>
+          <button class="btn ghost">Snooze</button>
+        </div>
+      </div>
+      <div class="foot"><span>Model v0.1</span><span>Confidence 0.78</span><span>Explainability enabled</span></div>
+    </aside>
+
+    <!-- PLAYBOOK MODAL -->
+    <div id="pbModal" class="modal" aria-hidden="true">
+      <div class="sheet">
+        <div class="row" style="justify-content:space-between; align-items:center;">
+          <h3>New Playbook</h3>
+          <button class="btn" onclick="closePlaybookModal()">Close</button>
+        </div>
+        <div class="grid-two">
+          <div class="field"><label>Name</label><input placeholder="e.g., Service CSI Recovery (L2)" /></div>
+          <div class="field"><label>Owner Role</label><input placeholder="Service Manager" /></div>
+          <div class="field"><label>Trigger</label><input placeholder="CSI < 85 or detractors spike" /></div>
+          <div class="field"><label>SLA (days)</label><input type="number" value="7" /></div>
+        </div>
+        <div class="field"><label>Steps</label><textarea rows="4" placeholder="Step 1…\nStep 2…\nStep 3…"></textarea></div>
+        <div class="grid-two">
+          <div class="field"><label>Evidence Types</label><input placeholder="Photos, call logs" /></div>
+          <div class="field"><label>Required Attachments</label><input placeholder="Template IDs (optional)" /></div>
+        </div>
+        <div class="row" style="justify-content:flex-end; gap:8px;">
+          <button class="btn">Save Draft</button>
+          <button class="btn primary">Publish</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Simple view switcher
+  const nav = document.getElementById('nav');
+  const views = Array.from(document.querySelectorAll('[id^=view-]'));
+  nav.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-view]');
+    if (!li) return;
+    nav.querySelectorAll('li').forEach(x => x.classList.remove('active'));
+    li.classList.add('active');
+    const viewId = 'view-' + li.dataset.view;
+    views.forEach(v => v.style.display = (v.id === viewId ? '' : 'none'));
+  });
+
+  // Drawer controls
+  const drawer = document.getElementById('actionsDrawer');
+  const pbTitle = document.getElementById('pbTitle');
+  function openDrawer(title){ pbTitle.textContent = title || pbTitle.textContent; drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); }
+  function closeDrawer(){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+  window.openDrawer = openDrawer; window.closeDrawer = closeDrawer;
+
+  // Explain stub
+  function explain(what){ alert('Explanation for: ' + what + '\n\nTop drivers, data sources, and confidence shown in the middle column.'); }
+  window.explain = explain;
+
+  // EV tabs
+  function switchTab(tab){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    ['infra','people','stock','policy'].forEach(id => {
+      document.getElementById('tab-'+id).style.display = (id===tab?'':'none');
+    });
+  }
+  window.switchTab = switchTab;
+
+  // Pin to QBR
+  const tray = document.getElementById('pinnedTray');
+  function pinToQBR(text){
+    const chip = document.createElement('div');
+    chip.className = 'pill';
+    chip.textContent = text;
+    tray?.appendChild(chip);
+  }
+  window.pinToQBR = pinToQBR;
+
+  // Playbook modal
+  const pbModal = document.getElementById('pbModal');
+  function openPlaybookModal(){ pbModal.classList.add('open'); pbModal.setAttribute('aria-hidden','false'); }
+  function closePlaybookModal(){ pbModal.classList.remove('open'); pbModal.setAttribute('aria-hidden','true'); }
+  window.openPlaybookModal = openPlaybookModal; window.closePlaybookModal = closePlaybookModal;
+</script>
+</body>
+</html>
