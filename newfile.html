@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Nexia BDM Catalyst – Clean Mockup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <style>
+    :root{
+      --bg:#f6f7f9;
+      --card:#ffffff;
+      --text:#0b0b0c;
+      --muted:#6b7280;
+      --line:#e9eaee;
+      --ink:#111111;
+      --accent:#ffd84d; /* restrained highlight */
+      --good:#22c55e; --warn:#f59e0b; --risk:#ef4444; --info:#2563eb;
+      --shadow: 0 10px 20px rgba(17,17,17,.06), 0 2px 6px rgba(17,17,17,.04);
+      --radius:18px;
+      --radius-sm:12px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font:14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      color:var(--text); background:var(--bg);
+    }
+    /* --- Layout --- */
+    .shell{display:grid; grid-template-columns: 260px 1fr; min-height:100vh}
+    aside{
+      position:sticky; top:0; height:100vh; padding:24px 18px; border-right:1px solid var(--line);
+      background:#fff;
+    }
+    .brand{display:flex; align-items:center; gap:12px; margin-bottom:22px}
+    .logo{
+      width:36px; height:36px; border-radius:10px; background:#111; color:#fff; display:grid; place-items:center;
+      font-weight:700; letter-spacing:.3px; box-shadow:var(--shadow);
+    }
+    .brand h1{font-size:16px; margin:0; font-weight:800; letter-spacing:.2px}
+    nav{display:flex; flex-direction:column; gap:6px}
+    .nav-item{
+      display:flex; align-items:center; gap:12px; padding:12px 12px; border-radius:12px; color:#111;
+      text-decoration:none; user-select:none; cursor:pointer; border:1px solid transparent;
+    }
+    .nav-item:hover{background:#f4f5f7}
+    .nav-item.active{background:#111; color:#fff; border-color:#111}
+    .nav-item svg{width:18px; height:18px}
+    .muted{color:var(--muted)}
+    .spacer{flex:1}
+    .footer-note{font-size:12px; color:#8b90a1; padding:12px}
+    /* --- Topbar --- */
+    header{
+      position:sticky; top:0; z-index:5; background:linear-gradient(to bottom, #fff, rgba(255,255,255,.85));
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between; padding:14px 22px;
+      backdrop-filter:saturate(140%) blur(6px);
+    }
+    .titlebar{display:flex; align-items:center; gap:12px}
+    .titlebar h2{margin:0; font-size:18px; font-weight:800}
+    .chip{padding:6px 10px; border-radius:999px; background:#111; color:#fff; font-size:12px; font-weight:700}
+    .chip.secondary{background:#eee; color:#111; border:1px solid var(--line)}
+    .search{
+      display:flex; align-items:center; gap:10px; background:#fff; border:1px solid var(--line);
+      padding:8px 12px; border-radius:999px; min-width:240px;
+    }
+    .search input{border:none; outline:none; background:transparent; width:200px}
+    .actions{display:flex; align-items:center; gap:10px}
+    .btn{
+      border:none; outline:none; padding:10px 14px; border-radius:12px; font-weight:700; cursor:pointer;
+      background:#111; color:#fff;
+    }
+    .btn.secondary{background:#fff; color:#111; border:1px solid var(--line)}
+    .btn.accent{background:var(--accent); color:#111}
+    .btn.ghost{background:transparent; color:#111; border:1px dashed var(--line)}
+    .btn:active{transform:translateY(1px)}
+    /* --- Content --- */
+    main{padding:22px}
+    .grid{display:grid; gap:18px}
+    .cols-12{grid-template-columns: repeat(12, 1fr)}
+    .card{
+      background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+    }
+    .card-body{padding:18px}
+    .card h3{margin:0 0 8px 0; font-size:16px}
+    .sub{font-size:12px; color:var(--muted)}
+    .tight{display:flex; align-items:center; gap:10px}
+    .kpis{display:flex; gap:10px; flex-wrap:wrap}
+    .kpi-chip{
+      border-radius:12px; padding:10px 12px; border:1px solid var(--line); background:#fff; display:flex; gap:8px; align-items:center;
+      min-width:150px; font-weight:700;
+    }
+    .dot{width:8px; height:8px; border-radius:999px; background:#d1d5db}
+    .dot.good{background:var(--good)} .dot.warn{background:var(--warn)} .dot.risk{background:var(--risk)}
+    .next-session{
+      background:#0d0d0f; color:#fff; border-radius:var(--radius); padding:18px; display:flex; align-items:center; justify-content:space-between;
+      box-shadow:var(--shadow); border:1px solid #0d0d0f;
+    }
+    .next-session .meta{display:flex; align-items:center; gap:12px}
+    .pill{background:#fff; color:#111; padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px}
+    .faint{opacity:.8}
+    .objective-list{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px}
+    .objective{border:1px solid var(--line); border-radius:14px; padding:14px; background:#fff}
+    .objective h4{margin:0 0 6px 0; font-size:14px}
+    .objective .hint{font-size:12px; color:var(--muted)}
+    .table{width:100%; border-collapse:separate; border-spacing:0 10px}
+    .table th,.table td{padding:10px 12px; text-align:left}
+    .table thead th{font-size:12px; color:#6b7280}
+    .row-card{background:#fff; border:1px solid var(--line); border-radius:12px}
+    .table .status{font-weight:700}
+    .status.good{color:var(--good)} .status.warn{color:var(--warn)} .status.risk{color:var(--risk)} .status.focus{color:#111}
+    .quickbar{
+      position:sticky; bottom:0; z-index:3; padding:14px 0 0; margin-top:6px;
+    }
+    .quickbar .bar{
+      background:#fff; border:1px solid var(--line); border-radius:999px; padding:8px; display:flex; gap:8px; justify-content:center;
+      box-shadow:var(--shadow);
+    }
+    .quiet{color:var(--muted)}
+    /* --- Pages (sections) --- */
+    section[hidden]{display:none !important}
+    .dealer-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:14px}
+    .dealer-card .top{display:flex; align-items:center; justify-content:space-between}
+    .tag{font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid var(--line); background:#fff; font-weight:700}
+    .tag.risk{border-color:var(--risk); color:var(--risk)}
+    .tag.op{border-color:#111}
+    .tag.imp{border-color:var(--good); color:var(--good)}
+    .list{display:flex; flex-direction:column; gap:10px}
+    .list .li{display:flex; align-items:center; justify-content:space-between; border:1px solid var(--line); padding:12px; border-radius:12px; background:#fff}
+    .li .lhs{display:flex; align-items:center; gap:12px}
+    .li .rhs{display:flex; align-items:center; gap:8px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px}
+    /* --- Responsiveness --- */
+    @media (max-width:1100px){
+      .shell{grid-template-columns: 80px 1fr}
+      aside{padding:18px 10px}
+      .brand h1{display:none}
+      .brand .logo{margin:0 auto}
+      .nav-item span{display:none}
+      .objective-list{grid-template-columns:1fr}
+      .dealer-grid{grid-template-columns:1fr}
+      header{gap:10px; flex-wrap:wrap}
+      .search{min-width:160px}
+    }
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Left navigation -->
+    <aside aria-label="Primary">
+      <div class="brand">
+        <div class="logo" aria-label="Nexia">Nx</div>
+        <h1>Nexia BDM Catalyst</h1>
+      </div>
+      <nav>
+        <a class="nav-item active" data-target="overview" role="button" aria-current="page">
+          <!-- home icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" stroke-width="1.7"/></svg>
+          <span>Overview</span>
+        </a>
+        <a class="nav-item" data-target="dealers" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="10" r="3" stroke-width="1.7"/><path d="M5 21c1.5-3 4.5-5 7-5s5.5 2 7 5" stroke-width="1.7"/></svg>
+          <span>Dealers</span>
+        </a>
+        <a class="nav-item" data-target="meetings" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="17" rx="2" stroke-width="1.7"/><path d="M3 9h18M8 3v4M16 3v4" stroke-width="1.7"/></svg>
+          <span>Meetings</span>
+        </a>
+        <a class="nav-item" data-target="actions" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h10" stroke-width="1.7"/><path d="m16 18 2 2 4-4" stroke-width="1.7"/></svg>
+          <span>Actions</span>
+        </a>
+        <a class="nav-item" data-target="playbooks" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 5h14a2 2 0 0 1 2 2v12H6a2 2 0 0 1-2-2z" stroke-width="1.7"/><path d="M4 17h16M8 5v12" stroke-width="1.7"/></svg>
+          <span>Playbooks</span>
+        </a>
+        <a class="nav-item" data-target="kpis" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 20V10m6 10V4m6 16v-7m4 7V8" stroke-width="1.7"/></svg>
+          <span>KPI Studio</span>
+        </a>
+        <a class="nav-item" data-target="knowledge" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="1.7"/><path d="m20 20-3.5-3.5" stroke-width="1.7"/></svg>
+          <span>Knowledge</span>
+        </a>
+        <div class="spacer"></div>
+        <a class="nav-item" data-target="settings" role="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke-width="1.7"/><path d="m19.4 15 .9 1.8-1.8 3.1-2.1-.5a7.6 7.6 0 0 1-1.8 1l-.3 2.2h-3.6l-.3-2.2a7.6 7.6 0 0 1-1.8-1l-2.1.5-1.8-3.1.9-1.8a7.6 7.6 0 0 1 0-2l-.9-1.8 1.8-3.1 2.1.5c.6-.4 1.2-.7 1.8-1l.3-2.2h3.6l.3 2.2c.6.3 1.2.6 1.8 1l2.1-.5 1.8 3.1-.9 1.8a7.6 7.6 0 0 1 0 2Z" stroke-width="1.7"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+      <div class="footer-note">v0.1 mock‑up • designed for field use • offline‑friendly</div>
+    </aside>
+
+    <div>
+      <!-- Top bar -->
+      <header>
+        <div class="titlebar">
+          <h2 id="page-title">Overview</h2>
+          <span class="chip">Daily</span>
+          <span class="chip secondary" id="date-pill"></span>
+        </div>
+        <div class="actions">
+          <div class="search" role="search">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0aa"><circle cx="11" cy="11" r="7" stroke-width="1.7"/><path d="m20 20-3.5-3.5" stroke-width="1.7"/></svg>
+            <input aria-label="Search" placeholder="Search dealers, playbooks, policies…" />
+          </div>
+          <button class="btn secondary" id="chat">Chat to Nexia</button>
+          <button class="btn accent" id="startMeeting">Start meeting bot</button>
+        </div>
+      </header>
+
+      <!-- Main content -->
+      <main class="grid">
+
+        <!-- ===== OVERVIEW ===== -->
+        <section id="overview" class="grid cols-12" aria-label="Overview">
+          <div class="card cols-12" style="grid-column:1/10">
+            <div class="card-body">
+              <div class="next-session" role="region" aria-label="Next session">
+                <div class="meta">
+                  <div class="pill">Next session</div>
+                  <div>
+                    <div style="font-weight:800">Osborne Park Mazda • 10:00–11:00</div>
+                    <div class="faint sub">Agenda: Q3 gap review, BT‑50 focus, accessories pack</div>
+                  </div>
+                </div>
+                <div class="tight">
+                  <button class="btn accent">Join meeting</button>
+                  <button class="btn">Open prep card</button>
+                </div>
+              </div>
+
+              <div style="margin-top:16px">
+                <h3>Today’s focus</h3>
+                <div class="objective-list" role="list">
+                  <div class="objective" role="listitem">
+                    <h4>Lift <strong>Service Retention</strong> trajectory to 42%</h4>
+                    <div class="hint">Coach advisors on timely follow‑up • push Service Hub usage</div>
+                  </div>
+                  <div class="objective" role="listitem">
+                    <h4>Increase <strong>Accessories $PNUR</strong> by +$150 on SUVs</h4>
+                    <div class="hint">Bundle delivery packs • reinforce value at handover</div>
+                  </div>
+                  <div class="objective" role="listitem">
+                    <h4>Triage <strong>aged stock 90+ days</strong></h4>
+                    <div class="hint">Swap into high‑demand PMA • demo refresh schedule</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI chips -->
+          <div class="card" style="grid-column:10/13">
+            <div class="card-body">
+              <div class="tight" style="justify-content:space-between">
+                <h3>KPI Autopilot <span class="sub">Live</span></h3>
+                <span class="pill" style="background:var(--accent)">Auto alerts</span>
+              </div>
+              <div class="kpis" style="margin-top:8px">
+                <div class="kpi-chip"><span class="dot good"></span> MSI (Sales/Service) <span class="spacer"></span><span>91 / 87</span></div>
+                <div class="kpi-chip"><span class="dot warn"></span> Service Retention <span class="spacer"></span><span>40% <span class="quiet">/ 42%</span></span></div>
+                <div class="kpi-chip"><span class="dot good"></span> PMA Share <span class="spacer"></span><span>6.5%</span></div>
+                <div class="kpi-chip"><span class="dot warn"></span> Accessories PNUR <span class="spacer"></span><span>$871</span></div>
+                <div class="kpi-chip"><span class="dot risk"></span> Aged Stock 90+ <span class="spacer"></span><span>37</span></div>
+              </div>
+              <div class="sub" style="margin-top:10px">Click any chip to open detail in KPI Studio.</div>
+            </div>
+          </div>
+
+          <!-- Risk & opportunity (short list) -->
+          <div class="card" style="grid-column:1/9">
+            <div class="card-body">
+              <div class="tight" style="justify-content:space-between">
+                <h3>Risk & Opportunity — Top</h3>
+                <button class="btn ghost" data-target="dealers">Open full list</button>
+              </div>
+              <table class="table" role="table" aria-label="Risk & Opportunity">
+                <thead>
+                  <tr><th>Dealer</th><th>Status</th><th>Why</th><th>Next best action</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="row-card">
+                    <td>Osborne Park Mazda</td>
+                    <td class="status focus">Opportunity</td>
+                    <td>Accessories under‑indexing on CX‑60</td>
+                    <td><button class="btn secondary">Bundle delivery packs</button></td>
+                  </tr>
+                  <tr class="row-card">
+                    <td>Rockingham Mazda</td>
+                    <td class="status risk">Risk</td>
+                    <td>MSI slip in Service Time</td>
+                    <td><button class="btn secondary">DVI + loan car comms</button></td>
+                  </tr>
+                  <tr class="row-card">
+                    <td>Bunbury Mazda</td>
+                    <td class="status warn">Focus</td>
+                    <td>BT‑50 gap to objective</td>
+                    <td><button class="btn secondary">Ute centre promo</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Quick actions -->
+          <div class="quickbar" style="grid-column:1/13">
+            <div class="bar" role="toolbar" aria-label="Quick actions">
+              <button class="btn secondary" id="qa-brief">Build dealer brief</button>
+              <button class="btn secondary" id="qa-visit">Create visit report</button>
+              <button class="btn secondary" id="qa-digest">Executive digest</button>
+              <button class="btn secondary" data-target="knowledge">Policy search</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== DEALERS ===== -->
+        <section id="dealers" class="grid cols-12" aria-label="Dealers" hidden>
+          <div class="card" style="grid-column:1/13">
+            <div class="card-body">
+              <div class="tight" style="justify-content:space-between; align-items:flex-end">
+                <div>
+                  <h3>Dealers</h3>
+                  <div class="sub">Find a dealer and act. This complements CRM by preparing, coaching and following‑through.</div>
+                </div>
+                <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0aa"><circle cx="11" cy="11" r="7" stroke-width="1.7"/><path d="m20 20-3.5-3.5" stroke-width="1.7"/></svg>
+                  <input aria-label="Search dealers" placeholder="Search dealers…" oninput="filterDealers(this.value)">
+                </div>
+              </div>
+              <div class="dealer-grid" id="dealerGrid" style="margin-top:12px">
+                <!-- Dealer cards -->
+                <div class="card dealer-card" data-name="Osborne Park Mazda">
+                  <div class="card-body">
+                    <div class="top">
+                      <strong>Osborne Park Mazda</strong>
+                      <span class="tag op">Opportunity</span>
+                    </div>
+                    <div class="sub" style="margin:8px 0">Accessories under‑indexing on CX‑60 • Service Retention 40%</div>
+                    <div class="tight">
+                      <button class="btn secondary">Open brief</button>
+                      <button class="btn">Open prep</button>
+                      <button class="btn accent">Start meeting</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card dealer-card" data-name="Rockingham Mazda">
+                  <div class="card-body">
+                    <div class="top"><strong>Rockingham Mazda</strong><span class="tag risk">Risk</span></div>
+                    <div class="sub" style="margin:8px 0">MSI slip in Service Time • Aged stock 18</div>
+                    <div class="tight">
+                      <button class="btn secondary">Open brief</button>
+                      <button class="btn">Open prep</button>
+                      <button class="btn accent">Start meeting</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card dealer-card" data-name="Bunbury Mazda">
+                  <div class="card-body">
+                    <div class="top"><strong>Bunbury Mazda</strong><span class="tag">Focus</span></div>
+                    <div class="sub" style="margin:8px 0">BT‑50 gap to target • PNUR trending up</div>
+                    <div class="tight">
+                      <button class="btn secondary">Open brief</button>
+                      <button class="btn">Open prep</button>
+                      <button class="btn accent">Start meeting</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card dealer-card" data-name="Bayswater Mazda">
+                  <div class="card-body">
+                    <div class="top"><strong>Bayswater Mazda</strong><span class="tag imp">Improving</span></div>
+                    <div class="sub" style="margin:8px 0">Parts purchases > target • MSI stable</div>
+                    <div class="tight">
+                      <button class="btn secondary">Open brief</button>
+                      <button class="btn">Open prep</button>
+                      <button class="btn accent">Start meeting</button>
+                    </div>
+                  </div>
+                </div>
+              </div><!-- /grid -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== MEETINGS ===== -->
+        <section id="meetings" class="grid cols-12" aria-label="Meetings" hidden>
+          <div class="card" style="grid-column:1/13">
+            <div class="card-body">
+              <h3>Upcoming meetings</h3>
+              <div class="list" style="margin-top:10px">
+                <div class="li">
+                  <div class="lhs">
+                    <div class="pill" style="background:var(--accent)">Today</div>
+                    <div><strong>Osborne Park Mazda</strong><div class="sub">10:00–11:00 • Q3 gap review</div></div>
+                  </div>
+                  <div class="rhs">
+                    <button class="btn secondary">Open prep</button>
+                    <button class="btn">View transcript</button>
+                    <button class="btn accent">Join</button>
+                  </div>
+                </div>
+                <div class="li">
+                  <div class="lhs">
+                    <div class="pill">Tomorrow</div>
+                    <div><strong>Rockingham Mazda</strong><div class="sub">09:00–09:45 • Service Time & DVI rollout</div></div>
+                  </div>
+                  <div class="rhs">
+                    <button class="btn secondary">Open prep</button>
+                    <button class="btn">View transcript</button>
+                    <button class="btn accent">Join</button>
+                  </div>
+                </div>
+              </div>
+
+              <h3 style="margin-top:20px">Follow‑ups from transcripts</h3>
+              <div class="list">
+                <div class="li">
+                  <div class="lhs">
+                    <div class="dot warn"></div>
+                    <div>Send accessories bundle deck to <strong>DP/GM</strong> — Osborne Park (due Fri)</div>
+                  </div>
+                  <div class="rhs">
+                    <button class="btn secondary">Draft email</button>
+                    <button class="btn">Assign</button>
+                  </div>
+                </div>
+                <div class="li">
+                  <div class="lhs">
+                    <div class="dot risk"></div>
+                    <div>Escalate warranty claim queue visibility — Rockingham (overdue)</div>
+                  </div>
+                  <div class="rhs"><button class="btn secondary">Escalate</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== ACTIONS ===== -->
+        <section id="actions" class="grid cols-12" aria-label="Actions" hidden>
+          <div class="card" style="grid-column:1/13">
+            <div class="card-body">
+              <div class="tight" style="justify-content:space-between">
+                <h3>Commitments tracker</h3>
+                <div class="tight">
+                  <span class="tag">Open</span>
+                  <span class="tag" style="border-color:var(--warn); color:var(--warn)">Due soon</span>
+                  <span class="tag" style="border-color:var(--risk); color:var(--risk)">Overdue</span>
+                </div>
+              </div>
+              <div class="list" style="margin-top:10px">
+                <div class="li">
+                  <div class="lhs">
+                    <input type="checkbox" aria-label="complete action" />
+                    <div><strong>Osborne Park Mazda</strong> — Run accessories pilot on CX‑60 <span class="mono quiet">(owner: Alex • due 30 Apr)</span></div>
+                  </div>
+                  <div class="rhs">
+                    <button class="btn secondary">Nudge</button>
+                    <button class="btn">Edit</button>
+                  </div>
+                </div>
+                <div class="li">
+                  <div class="lhs">
+                    <input type="checkbox" />
+                    <div><strong>Rockingham Mazda</strong> — Enable DVI in Service Hub <span class="mono quiet">(owner: SM • due 25 Apr)</span></div>
+                  </div>
+                  <div class="rhs"><button class="btn secondary">Nudge</button><button class="btn">Edit</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== PLAYBOOKS ===== -->
+        <section id="playbooks" class="grid cols-12" aria-label="Playbooks" hidden>
+          <div class="card" style="grid-column:1/13">
+            <div class="card-body">
+              <h3>Context playbooks</h3>
+              <div class="sub">Micro‑playbooks that solve common gaps. Applied to a dealer, not stored in CRM.</div>
+              <div class="dealer-grid" style="margin-top:12px">
+                <div class="card"><div class="card-body">
+                  <strong>Service Retention → 42%</strong><div class="sub">Contact cadence, recall, win‑back, trust enablers</div>
+                  <div class="tight" style="margin-top:8px"><button class="btn secondary">Preview</button><button class="btn">Apply to dealer</button></div>
+                </div></div>
+                <div class="card"><div class="card-body">
+                  <strong>Accessories PNUR +$150</strong><div class="sub">Handover prompts, bundles, advisor scorecard</div>
+                  <div class="tight" style="margin-top:8px"><button class="btn secondary">Preview</button><button class="btn">Apply to dealer</button></div>
+                </div></div>
+                <div class="card"><div class="card-body">
+                  <strong>BT‑50 Ute Centre lift</strong><div class="sub">Demo plan, fleet focus, sales enablement</div>
+                  <div class="tight" style="margin-top:8px"><button class="btn secondary">Preview</button><button class="btn">Apply to dealer</button></div>
+                </div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== KPI STUDIO ===== -->
+        <section id="kpis" class="grid cols-12" aria-label="KPI Studio" hidden>
+          <div class="card" style="grid-column:1/13">
+            <div class="card-body">
+              <h3>KPI Studio</h3>
+              <div class="kpis" style="margin-top:8px">
+                <div class="kpi-chip"><span class="dot good"></span> Sales vs Objective <span class="spacer"></span><span>102%</span></div>
+                <div class="kpi-chip"><span class="dot warn"></span> Service Retention <span class="spacer"></span><span>40% <span class="quiet">/ 42%</span></span></div>
+                <div class="kpi-chip"><span class="dot good"></span> PMA Share <span class="spacer"></span><span>6.5%</span></div>
+                <div class="kpi-chip"><span class="dot good"></span> % Sold by Dealer <span class="spacer"></span><span>61.9%</span></div>
+                <div class="kpi-chip"><span class="dot warn"></span> Accessories PNUR <span class="spacer"></span><span>$871</span></div>
+                <div class="kpi-chip"><span class="dot risk"></span> Aged Stock 90+ <span class="spacer"></span><span>37</span></div>
+              </div>
+              <div class="sub" style="margin-top:10px">These chips expand into focused charts in your production app.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== KNOWLEDGE ===== -->
+        <section id="knowledge" class="grid cols-12" aria-label="Knowledge" hidden>
+          <div class="card" style="grid-column:1/13">
+            <div class="card-body">
+              <h3>Knowledge Navigator</h3>
+              <div class="sub">RAG over standards, programme rules, and best practice (your Pinecone index).</div>
+              <div class="search" style="margin-top:8px; max-width:620px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9aa0aa"><circle cx="11" cy="11" r="7" stroke-width="1.7"/><path d="m20 20-3.5-3.5" stroke-width="1.7"/></svg>
+                <input aria-label="Ask a policy" placeholder="e.g., What’s the warranty claim process for EV high‑voltage packs?">
+              </div>
+              <div class="list" style="margin-top:12px">
+                <div class="li"><div class="lhs"><div class="dot good"></div><div><strong>Answer (draft)</strong> — Step‑by‑step with source cites • ready to paste into email</div></div><div class="rhs"><button class="btn secondary">Copy</button></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SETTINGS (placeholder) ===== -->
+        <section id="settings" aria-label="Settings" hidden>
+          <div class="card"><div class="card-body">
+            <h3>Settings</h3>
+            <div class="sub">Role‑based access, data sources, and notification preferences.</div>
+          </div></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Date pill
+    (function(){
+      const d = new Date();
+      const fmt = d.toLocaleDateString('en-AU', {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+      document.getElementById('date-pill').textContent = fmt;
+    })();
+
+    // Simple router
+    const links = document.querySelectorAll('.nav-item, [data-target]');
+    const sections = document.querySelectorAll('main > section');
+    function show(id){
+      sections.forEach(s => s.hidden = s.id !== id);
+      links.forEach(l => l.classList.toggle('active', l.dataset.target === id && l.classList.contains('nav-item')));
+      const titleMap = {overview:'Overview', dealers:'Dealers', meetings:'Meetings', actions:'Actions', playbooks:'Playbooks', kpis:'KPI Studio', knowledge:'Knowledge', settings:'Settings'};
+      document.getElementById('page-title').textContent = titleMap[id] || 'Overview';
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    links.forEach(l => l.addEventListener('click', (e)=> {
+      const id = l.dataset.target;
+      if(id){ e.preventDefault(); show(id); }
+    }));
+
+    // Quick actions open pages
+    document.getElementById('qa-brief').addEventListener('click', ()=> alert('This would build a one‑click dealer brief (from your sources).'));
+    document.getElementById('qa-visit').addEventListener('click', ()=> alert('This would generate an OEM‑standard visit report in seconds.'));
+    document.getElementById('qa-digest').addEventListener('click', ()=> alert('This would roll your dealer reports into a management‑ready digest.'));
+
+    // Dealer search
+    function filterDealers(q){
+      const cards = document.querySelectorAll('.dealer-card');
+      cards.forEach(c=>{
+        const name = c.dataset.name.toLowerCase();
+        c.style.display = !q || name.includes(q.toLowerCase()) ? '' : 'none';
+      });
+    }
+    window.filterDealers = filterDealers;
+
+    // Demo buttons
+    document.getElementById('chat').addEventListener('click', ()=> alert('Opens Nexia chat (RAG over your Pinecone + action tools).'));
+    document.getElementById('startMeeting').addEventListener('click', ()=> { show('meetings'); alert('Starts meeting bot: live transcription + prompts + action capture.'); });
+  </script>
+</body>
+</html>
