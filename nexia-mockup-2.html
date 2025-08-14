@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexia BDM Catalyst</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #1a1a1a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-item.active {
+            color: #1a1a1a;
+            position: relative;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #FFD93D;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .welcome-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .welcome-text h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .welcome-text p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .date-time {
+            text-align: right;
+        }
+
+        .date {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .time {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .card-badge {
+            background: #FFD93D;
+            color: #1a1a1a;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-urgent {
+            background: #FF6B6B;
+            color: white;
+        }
+
+        .badge-success {
+            background: #51CF66;
+            color: white;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .kpi-item {
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .kpi-trend {
+            font-size: 12px;
+            color: #51CF66;
+        }
+
+        .kpi-trend.down {
+            color: #FF6B6B;
+        }
+
+        /* Dealer Performance */
+        .dealer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dealer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .dealer-item:hover {
+            background: #1a1a1a;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .dealer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dealer-avatar {
+            width: 40px;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .dealer-item:hover .dealer-avatar {
+            background: #FFD93D;
+            color: #1a1a1a;
+        }
+
+        .dealer-details h4 {
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .dealer-details p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dealer-item:hover .dealer-details p {
+            color: #ccc;
+        }
+
+        .dealer-score {
+            text-align: right;
+        }
+
+        .score-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .score-label {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .dealer-item:hover .score-label {
+            color: #ccc;
+        }
+
+        /* Action Items */
+        .action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-item {
+            padding: 12px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-checkbox:hover {
+            border-color: #1a1a1a;
+            background: #1a1a1a;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .action-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .action-priority {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #FFD93D;
+        }
+
+        .action-priority.high {
+            background: #FF6B6B;
+        }
+
+        /* Performance Chart */
+        .chart-container {
+            height: 200px;
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 160px;
+            gap: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            min-height: 20px;
+            transition: all 0.3s;
+        }
+
+        .chart-bar.active {
+            background: #1a1a1a;
+        }
+
+        .chart-bar:hover {
+            background: #FFD93D;
+        }
+
+        .chart-labels {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .chart-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        /* Bottom Section */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        /* Meeting Schedule */
+        .schedule-timeline {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #1a1a1a;
+            border-radius: 50px;
+            color: white;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+        }
+
+        .timeline-item.active {
+            background: #FFD93D;
+            color: #1a1a1a;
+            border-radius: 40px;
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .timeline-dealer {
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .quick-action-btn {
+            padding: 15px;
+            background: #f8f8f8;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .quick-action-btn:hover {
+            background: #1a1a1a;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .quick-action-btn.primary {
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .quick-action-btn.primary:hover {
+            background: #FFD93D;
+            color: #1a1a1a;
+        }
+
+        /* Meeting Assistant */
+        .meeting-assistant {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .assistant-icon {
+            width: 50px;
+            height: 50px;
+            background: #FFD93D;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .assistant-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .assistant-status {
+            font-size: 13px;
+            color: #FFD93D;
+            margin-bottom: 20px;
+        }
+
+        .assistant-action {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            display: block;
+            width: 100%;
+        }
+
+        .assistant-action:hover {
+            background: #FFD93D;
+            color: #1a1a1a;
+            border-color: #FFD93D;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-grid,
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">N</div>
+                <div class="logo-text">Nexia</div>
+            </div>
+            <div class="header-nav">
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="#" class="nav-item">Dealers</a>
+                <a href="#" class="nav-item">Analytics</a>
+                <a href="#" class="nav-item">Schedule</a>
+                <a href="#" class="nav-item">Reports</a>
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar">JD</div>
+            </div>
+        </div>
+
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <div class="welcome-header">
+                <div class="welcome-text">
+                    <h1>Good morning, John!</h1>
+                    <p>You have 3 dealer visits today and 2 urgent actions pending</p>
+                </div>
+                <div class="date-time">
+                    <div class="date">Thursday, August 14, 2025</div>
+                    <div class="time">09:42 AM</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Today's KPIs -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Region Performance</div>
+                    <div class="card-badge">Live</div>
+                </div>
+                <div class="kpi-grid">
+                    <div class="kpi-item">
+                        <div class="kpi-label">Sales vs Objective</div>
+                        <div class="kpi-value">87%</div>
+                        <div class="kpi-trend">↑ 5% vs last month</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-label">Service Retention</div>
+                        <div class="kpi-value">41.2%</div>
+                        <div class="kpi-trend down">↓ 0.8% vs target</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-label">MSI Score</div>
+                        <div class="kpi-value">94.3</div>
+                        <div class="kpi-trend">↑ 2.1 points</div>
+                    </div>
+                    <div class="kpi-item">
+                        <div class="kpi-label">Parts $PNUR</div>
+                        <div class="kpi-value">$1,875</div>
+                        <div class="kpi-trend">↑ $150 vs avg</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priority Dealers -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Priority Dealers</div>
+                    <div class="card-badge badge-urgent">3 Need Attention</div>
+                </div>
+                <div class="dealer-list">
+                    <div class="dealer-item">
+                        <div class="dealer-info">
+                            <div class="dealer-avatar">CM</div>
+                            <div class="dealer-details">
+                                <h4>City Motors</h4>
+                                <p>Service retention declining</p>
+                            </div>
+                        </div>
+                        <div class="dealer-score">
+                            <div class="score-value">72</div>
+                            <div class="score-label">SCORE</div>
+                        </div>
+                    </div>
+                    <div class="dealer-item">
+                        <div class="dealer-info">
+                            <div class="dealer-avatar">WA</div>
+                            <div class="dealer-details">
+                                <h4>West Auto</h4>
+                                <p>Inventory aging >90 days</p>
+                            </div>
+                        </div>
+                        <div class="dealer-score">
+                            <div class="score-value">68</div>
+                            <div class="score-label">SCORE</div>
+                        </div>
+                    </div>
+                    <div class="dealer-item">
+                        <div class="dealer-info">
+                            <div class="dealer-avatar">PM</div>
+                            <div class="dealer-details">
+                                <h4>Premium Motors</h4>
+                                <p>CSI dropped 5 points</p>
+                            </div>
+                        </div>
+                        <div class="dealer-score">
+                            <div class="score-value">81</div>
+                            <div class="score-label">SCORE</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Today's Actions</div>
+                    <div class="card-badge">5 Items</div>
+                </div>
+                <div class="action-list">
+                    <div class="action-item">
+                        <div class="action-checkbox"></div>
+                        <div class="action-content">
+                            <div class="action-title">Review City Motors service plan</div>
+                            <div class="action-meta">Due by 11:00 AM</div>
+                        </div>
+                        <div class="action-priority high"></div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-checkbox"></div>
+                        <div class="action-content">
+                            <div class="action-title">Send Q3 performance report</div>
+                            <div class="action-meta">For management review</div>
+                        </div>
+                        <div class="action-priority high"></div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-checkbox"></div>
+                        <div class="action-content">
+                            <div class="action-title">Follow up on parts order</div>
+                            <div class="action-meta">West Auto - 3 days overdue</div>
+                        </div>
+                        <div class="action-priority"></div>
+                    </div>
+                    <div class="action-item">
+                        <div class="action-checkbox"></div>
+                        <div class="action-content">
+                            <div class="action-title">Schedule training for Premium Motors</div>
+                            <div class="action-meta">Service standards workshop</div>
+                        </div>
+                        <div class="action-priority"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section -->
+        <div class="bottom-grid">
+            <!-- Meeting Schedule & Performance -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Today's Schedule</div>
+                    <div class="card-badge badge-success">On Track</div>
+                </div>
+                
+                <div class="schedule-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-time">9:00 AM</div>
+                        <div class="timeline-dealer">Team Sync</div>
+                    </div>
+                    <div class="timeline-item active">
+                        <div class="timeline-time">10:30 AM</div>
+                        <div class="timeline-dealer">City Motors</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">2:00 PM</div>
+                        <div class="timeline-dealer">West Auto</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-time">4:00 PM</div>
+                        <div class="timeline-dealer">Premium Motors</div>
+                    </div>
+                </div>
+
+                <div class="card-header" style="margin-top: 30px; margin-bottom: 0;">
+                    <div class="card-title">Weekly Performance Trend</div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-bars">
+                        <div class="chart-bar" style="height: 60%;"></div>
+                        <div class="chart-bar" style="height: 75%;"></div>
+                        <div class="chart-bar active" style="height: 85%;"></div>
+                        <div class="chart-bar" style="height: 80%;"></div>
+                        <div class="chart-bar" style="height: 90%;"></div>
+                        <div class="chart-bar" style="height: 70%;"></div>
+                        <div class="chart-bar" style="height: 65%;"></div>
+                    </div>
+                    <div class="chart-labels">
+                        <span class="chart-label">Mon</span>
+                        <span class="chart-label">Tue</span>
+                        <span class="chart-label">Wed</span>
+                        <span class="chart-label">Thu</span>
+                        <span class="chart-label">Fri</span>
+                        <span class="chart-label">Sat</span>
+                        <span class="chart-label">Sun</span>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-action-btn">Generate Report</button>
+                    <button class="quick-action-btn">View Analytics</button>
+                    <button class="quick-action-btn primary">Prep Next Visit</button>
+                    <button class="quick-action-btn">Check Insights</button>
+                </div>
+            </div>
+
+            <!-- Meeting Assistant -->
+            <div class="card" style="padding: 0;">
+                <div class="meeting-assistant">
+                    <div class="assistant-icon">🎯</div>
+                    <div class="assistant-title">Meeting Intelligence</div>
+                    <div class="assistant-status">Ready for City Motors visit</div>
+                    
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 8px;">KEY TALKING POINTS</div>
+                        <ul style="list-style: none; font-size: 13px; line-height: 1.8;">
+                            <li>📍 Service retention down 4%</li>
+                            <li>📍 Quick Smart Service adoption</li>
+                            <li>📍 Parts pricing adjustment</li>
+                            <li>📍 Q4 allocation planning</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 8px;">SUGGESTED OUTCOMES</div>
+                        <div style="font-size: 13px; line-height: 1.6;">
+                            Increase service retention to 42% by implementing Digital Video Inspection
+                        </div>
+                    </div>
+
+                    <button class="assistant-action">Start Meeting Mode</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
